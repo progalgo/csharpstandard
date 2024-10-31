@@ -1843,7 +1843,7 @@ It is an error to apply the null-forgiving operator more than once to the same e
 > *Example*: the following are all invalid:
 >
 > ```csharp
-> var p = q!!;         // error: cannot apply the null_forgiving_operator more than once
+> var p = q!!;            // error: cannot apply the null_forgiving_operator more than once
 > var s = ( ( m(t) ! ) )! // error: null_forgiving_operator applied twice to m(t)
 > ```
 
