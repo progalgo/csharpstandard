@@ -147,7 +147,7 @@ The precedence of an operator is established by the definition of its associated
 >
 > |  **Subclause**      | **Category**                     | **Operators**                                          |
 > |  -----------------  | -------------------------------  | -------------------------------------------------------|
-> |  [§12.8](expressions.md#128-primary-expressions)              | Primary                          | `x.y` `x?.y` `f(x)` `a[x]` `a?[x]` `x++` `x--` `new` `typeof` `default` `checked` `unchecked` `delegate` `stackalloc`  |
+> |  [§12.8](expressions.md#128-primary-expressions)              | Primary                          | `x.y` `x?.y` `f(x)` `a[x]` `a?[x]` `x++` `x--` `x!` `new` `typeof` `default` `checked` `unchecked` `delegate` `stackalloc`  |
 > |  [§12.9](expressions.md#129-unary-operators)              | Unary                            | `+` `-` `!` `~` `++x` `--x` `(T)x` `await x` |
 > |  [§12.10](expressions.md#1210-arithmetic-operators)              | Multiplicative                   | `*` `/` `%` |
 > |  [§12.10](expressions.md#1210-arithmetic-operators)              | Additive                         | `+` `-` |
@@ -1273,7 +1273,6 @@ Primary expressions include the simplest forms of expressions.
 primary_expression
     : primary_no_array_creation_expression
     | array_creation_expression
-    | null_forgiving_expression
     ;
 
 primary_no_array_creation_expression
@@ -1291,6 +1290,7 @@ primary_no_array_creation_expression
     | base_access
     | post_increment_expression
     | post_decrement_expression
+    | null_forgiving_expression
     | object_creation_expression
     | delegate_creation_expression
     | anonymous_object_creation_expression
@@ -1307,7 +1307,7 @@ primary_no_array_creation_expression
     ;
 ```
 
-> *Note*: These grammar rules are not ANTLR-ready as they are part of a set of mutually left-recursive rules (`primary_expression`, `primary_no_array_creation_expression`, `member_access`, `invocation_expression`, `element_access`, `post_increment_expression`, `post_decrement_expression`, `pointer_member_access` and `pointer_element_access`) which ANTLR does not handle. Standard techniques can be used to transform the grammar to remove the mutual left-recursion. This has not been done as not all parsing strategies require it (e.g. an LALR parser would not) and doing so would obfuscate the structure and description. *end note*
+> *Note*: These grammar rules are not ANTLR-ready as they are part of a set of mutually left-recursive rules (`primary_expression`, `primary_no_array_creation_expression`, `member_access`, `invocation_expression`, `element_access`, `post_increment_expression`, `post_decrement_expression`, `null_forgiving_expression`, `pointer_member_access` and `pointer_element_access`) which ANTLR does not handle. Standard techniques can be used to transform the grammar to remove the mutual left-recursion. This has not been done as not all parsing strategies require it (e.g. an LALR parser would not) and doing so would obfuscate the structure and description. *end note*
 
 *pointer_member_access* ([§23.6.3](unsafe-code.md#2363-pointer-member-access)) and *pointer_element_access* ([§23.6.4](unsafe-code.md#2364-pointer-element-access)) are only available in unsafe code ([§23](unsafe-code.md#23-unsafe-code)).
 
@@ -1824,17 +1824,28 @@ A *null_conditional_projection_initializer* is a restriction of *null_conditiona
 
 ### 12.8.9 Null-forgiving expressions
 
-This operator sets the null state ([§8.9.5](types.md#895-nullabilities-and-null-states)) of the operand to “not null”.
+The null-forgiving operator sets the null state ([§8.9.5](types.md#895-nullabilities-and-null-states)) of the operand to “not null”.
 
 ```ANTLR
 null_forgiving_expression
-    : primary_no_array_creation_expression suppression
+    : primary_expression null_forgiving_operator
     ;
 
-suppression
+null_forgiving_operator
     : '!'
     ;
 ```
+
+The *primary_expression* must not be known to have a value type.
+
+It is an error to apply the null-forgiving operator more than once to the same expression, intervening parenetheses notwithstanding.
+
+> *Example*: the following are all invalid:
+>
+> ```csharp
+> var p = q!!;         // error: cannot apply the null_forgiving_operator more than once
+> var s = ( ( m(t) ! ) )! // error: null_forgiving_operator applied twice to m(t)
+> ```
 
 This operator has no runtime effect; it evaluates to the result of its operand, and that result retains that operand’s classification.
 
