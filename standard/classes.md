@@ -4453,8 +4453,12 @@ unary_operator_declarator
     : type 'operator' overloadable_unary_operator '(' fixed_parameter ')'
     ;
 
+logical_negation_operator
+    : '!'
+    ;
+
 overloadable_unary_operator
-    : '+' | '-' | '!' | '~' | '++' | '--' | 'true' | 'false'
+    : '+' | '-' | logical_negation_operator | '~' | '++' | '--' | 'true' | 'false'
     ;
 
 binary_operator_declarator
@@ -4480,6 +4484,8 @@ operator_body
 ```
 
 *unsafe_modifier* ([§23.2](unsafe-code.md#232-unsafe-contexts)) is only available in unsafe code ([§23](unsafe-code.md#23-unsafe-code)).
+
+*Note*: The prefix logical negation ([§12.9.4](expressions.md#1294-logical-negation-operator)) and postfix null-forgiving operators ([§12.8.9](expressions.md#1289-null-forgiving-expressions)), while represented by the same lexical token (`!`), are distinct. The latter is not an overloadable operator. *end note*
 
 There are three categories of overloadable operators: Unary operators ([§15.10.2](classes.md#15102-unary-operators)), binary operators ([§15.10.3](classes.md#15103-binary-operators)), and conversion operators ([§15.10.4](classes.md#15104-conversion-operators)).
 
@@ -4507,7 +4513,7 @@ Additional information on conversion operators can be found in [§10.5](convers
 
 The following rules apply to unary operator declarations, where `T` denotes the instance type of the class or struct that contains the operator declaration:
 
-- A unary `+`, `-`, `!`, or `~` operator shall take a single parameter of type `T` or `T?` and can return any type.
+- A unary `+`, `-`, `!` (logical negation only), or `~` operator shall take a single parameter of type `T` or `T?` and can return any type.
 - A unary `++` or `--` operator shall take a single parameter of type `T` or `T?` and shall return that same type or a type derived from it.
 - A unary `true` or `false` operator shall take a single parameter of type `T` or `T?` and shall return type `bool`.
 

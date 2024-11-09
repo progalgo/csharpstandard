@@ -720,12 +720,12 @@ An *unmanaged_type* is any type that isn’t a *reference_type*, a *type_paramet
 
 ### 8.9.1 General
 
-A *nullable reference type* is denoted by appending a `?` to a valid non-nullable reference type name. There is no semantic difference between a non-nullable reference type and its corresponding nullable type. Both a nullable reference and a non-nullable reference can contain either a reference to an object or `null`. The presence or absence of the `?` annotation declares whether an expression is intended to permit null values or not. A compiler can provide diagnostics when an expression is not used according to that intent. The null state of an expression is defined in [§8.9.5](types.md#895-nullabilities-and-null-states). An identity conversion exists among a nullable reference type and its corresponding non-nullable reference type ([§10.2.2](conversions.md#1022-identity-conversion)).
+A *nullable reference type* is denoted by appending a *nullable_type_attribute* (`?`) to a non-nullable reference type. There is no semantic difference between a non-nullable reference type and its corresponding nullable type, both can either be a reference to an object or `null`. The presence or absence of the *nullable_type_attribute* declares whether an expression is intended to permit null values or not. A compiler may provide diagnostics when an expression is not used according to that intent. The null state of an expression is defined in [§8.9.5](types.md#895-nullabilities-and-null-states). An identity conversion exists among a nullable reference type and its corresponding non-nullable reference type ([§10.2.2](conversions.md#1022-identity-conversion)).
 
 There are two forms of nullability for reference types:
 
 - *nullable*: A *nullable-reference-type* can be assigned `null`. Its default null state is *maybe-null*.
-- *non-nullable*” A *non-nullable reference* should not be assigned a `null` value. Its default null state is *not-null*.
+- *non-nullable*: A *non-nullable reference* should not be assigned a `null` value. Its default null state is *not-null*.
 
 > *Note:* The types `R` and `R?` are represented by the same underlying type, `R`. A variable of that underlying type can either contain a reference to an object or be the value `null`, which indicates “no reference.” *end note*
 
@@ -787,7 +787,7 @@ When the nullable context is ***annotations***:
 
 - For any reference type `T`, the annotation `?` in `T?` indicates that `T?` a nullable type, whereas the unannotated `T` is non-nullable.
 - No diagnostic warnings related to nullability are generated.
-- The null-forgiving operator `!` ([§12.8.9](expressions.md#1289-null-forgiving-expressions)) sets the null state of its operand to *not null*.
+- The null-forgiving operator `!` ([§12.8.9](expressions.md#1289-null-forgiving-expressions)) may alter the analyzed null state of its operand and what compile time informative messages are produced.
 
 > *Example*:
 >

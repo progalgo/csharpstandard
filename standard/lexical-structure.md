@@ -1149,7 +1149,7 @@ The namespace for conditional compilation symbols is distinct and separate from 
 
 ### 6.5.3 Pre-processing expressions
 
-Pre-processing expressions can occur in `#if` and `#elif` directives. The operators `!`, `==`, `!=`, `&&`, and `||` are permitted in pre-processing expressions, and parentheses may be used for grouping.
+Pre-processing expressions can occur in `#if` and `#elif` directives. The operators `!` (prefix logical negation only), `==`, `!=`, `&&`, and `||` are permitted in pre-processing expressions, and parentheses may be used for grouping.
 
 ```ANTLR
 fragment PP_Expression
