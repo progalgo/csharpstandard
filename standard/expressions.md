@@ -182,10 +182,10 @@ All unary and binary operators have predefined implementations. In addition, use
 
 The ***overloadable unary operators*** are:
 
-`+  -  ! `(logical negation only)` ~  ++  --  true  false`
+`+  -  !` (logical negation only) `~  ++  --  true  false`
 
 > *Note*: Although `true` and `false` are not used explicitly in expressions (and therefore are not included in the precedence table in [§12.4.2](expressions.md#1242-operator-precedence-and-associativity)), they are considered operators because they are invoked in several expression contexts: Boolean expressions ([§12.24](expressions.md#1224-boolean-expressions)) and expressions involving the conditional ([§12.18](expressions.md#1218-conditional-operator)) and conditional logical operators ([§12.14](expressions.md#1214-conditional-logical-operators)). *end note*
-
+>
 > *Note*: The null-forgiving operator (postfix `!`, [§12.8.9](expressions.md#1289-null-forgiving-expressions)) is not an overloadable operator. *end note*
 
 The ***overloadable binary operators*** are:
@@ -1827,7 +1827,6 @@ A *null_conditional_projection_initializer* is a restriction of *null_conditiona
 A null-forgiving expression’s value, type, classification ([§12.2](expressions.md#122-expression-classifications))
 and safe-context ([§16.4.12](structs.md#16412-safe-context-constraint)) is the value, type, classification and safe-context of its *primary_expression*.
 
-
 ```ANTLR
 null_forgiving_expression
     : primary_expression null_forgiving_operator
@@ -1878,12 +1877,12 @@ message and informs any ongoing analysis.
 >     person != null && person.Name != null;
 > ```
 >
-> If `IsValid` returns `true`, `p` can safely be dereferenced to access its `Name` property, and the “dereferencing of a possibly null value” warning can be suppressed using `!`. 
+> If `IsValid` returns `true`, `p` can safely be dereferenced to access its `Name` property, and the “dereferencing of a possibly null value” warning can be suppressed using `!`.
 >
 > *end example*
-
+>
 > *Example:* The null-forgiving operator should be used with caution, consider:
-
+>
 > ```csharp
 > #nullable enable
 > int B(int? x)
@@ -1896,6 +1895,8 @@ message and informs any ongoing analysis.
 > Here the null-forgiving operator is applied to a value type and quashes any warning on
 > `x`. However if `x` is `null` at runtime an exception will be thrown as `null` cannot
 > be cast to `int`.
+>
+> *end example*
 
 #### 12.8.9.2 Overriding other null analysis warnings
 
@@ -1926,7 +1927,7 @@ to issue warnings and may also modify its further analysis.
 > Method `M` passes the variable `s`, of type `string`, as `Assign`’s output parameter, the
 > compiler used issues a warning as `s` is not a nullable variable. Given that `Assign`’s
 > second argument cannot be null the null-forgiving operator is used to quash the warning.
-
+>
 > *end example*
 
 **End of conditionally normative text.**
