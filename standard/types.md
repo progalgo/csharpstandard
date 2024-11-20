@@ -76,8 +76,13 @@ delegate_type
     ;
 
 nullable_reference_type
-    : non_nullable_reference_type '?'
+    : non_nullable_reference_type nullable_type_annotation
     ;
+
+nullable_type_annotation
+    : '?'
+    ;
+
 ```
 
 *pointer_type* is available only in unsafe code ([§23.3](unsafe-code.md#233-pointer-types)). *nullable_reference_type* is discussed further in [§8.9](types.md#89-reference-types-and-nullability).
@@ -206,7 +211,7 @@ enum_type
     ;
 
 nullable_value_type
-    : non_nullable_value_type '?'
+    : non_nullable_value_type nullable_type_annotation
     ;
 ```
 
@@ -538,10 +543,11 @@ type_arguments
 
 type_argument
     : type
+    | type_parameter nullable_type_annotation?
     ;
 ```
 
-Each type argument shall satisfy any constraints on the corresponding type parameter ([§15.2.5](classes.md#1525-type-parameter-constraints)).
+Each type argument shall satisfy any constraints on the corresponding type parameter ([§15.2.5](classes.md#1525-type-parameter-constraints)). A reference type argument whose nullability doesn’t match the nullability of the type parameter satisfies the constraint; however a warning may be issued.
 
 ### 8.4.3 Open and closed types
 
@@ -720,7 +726,7 @@ An *unmanaged_type* is any type that isn’t a *reference_type*, a *type_paramet
 
 ### 8.9.1 General
 
-A *nullable reference type* is denoted by appending a `?` to a valid non-nullable reference type name. There is no semantic difference between a non-nullable reference type and its corresponding nullable type. Both a nullable reference and a non-nullable reference can contain either a reference to an object or `null`. The presence or absence of the `?` annotation declares whether an expression is intended to permit null values or not. A compiler can provide diagnostics when an expression is not used according to that intent. The null state of an expression is defined in [§8.9.5](types.md#895-nullabilities-and-null-states). An identity conversion exists among a nullable reference type and its corresponding non-nullable reference type ([§10.2.2](conversions.md#1022-identity-conversion)).
+A *nullable reference type* is denoted by appending a *nullable_type_annotation* (`?`) to a non-nullable reference type. There is no semantic difference between a non-nullable reference type and its corresponding nullable type, both can either be a reference to an object or `null`. The presence or absence of the *nullable_type_annotation* declares whether an expression is intended to permit null values or not. A compiler may provide diagnostics when an expression is not used according to that intent. The null state of an expression is defined in [§8.9.5](types.md#895-nullabilities-and-null-states). An identity conversion exists among a nullable reference type and its corresponding non-nullable reference type ([§10.2.2](conversions.md#1022-identity-conversion)).
 
 There are two forms of nullability for reference types:
 
@@ -729,7 +735,7 @@ There are two forms of nullability for reference types:
 
 > *Note:* The types `R` and `R?` are represented by the same underlying type, `R`. A variable of that underlying type can either contain a reference to an object or be the value `null`, which indicates “no reference.” *end note*
 
-The syntactic distinction between a *nullable reference type* and its corresponding *non-nullable reference type* enables a compiler to generate diagnostics. A compiler shall allow the `?` annotation as defined in [§8.2.1](types.md#821-general). The diagnostics shall be limited to warnings. Neither the presence or absence of nullable annotations, nor the state of the nullable context can change the compile time or runtime behavior of a program except for changes in any diagnostic messages generated at compile time.
+The syntactic distinction between a *nullable reference type* and its corresponding *non-nullable reference type* enables a compiler to generate diagnostics. A compiler must allow the *nullable_type_annotation* as defined in [§8.2.1](types.md#821-general). The diagnostics must be limited to warnings. Neither the presence or absence of nullable annotations, nor the state of the nullable context can change the compile time or runtime behavior of a program except for changes in any diagnostic messages generated at compile time.
 
 ### 8.9.2 Non-nullable reference types
 
@@ -762,6 +768,9 @@ When the nullable context is ***disabled***:
 - No warning shall be generated when a variable of an unannotated reference type is initialized with, or assigned a value of, `null`.
 - No warning shall be generated when a variable of a reference type that possibly has the null value.
 - For any reference type `T`, the annotation `?` in `T?` generates a message and the type `T?` is the same as `T`.
+- For any type parameter constraint `where T : C?`, the annotation `?` in `C?` generates a message and the type `C?` is the same as `C`.
+- For any type parameter constraint `where T : U?`, the annotation `?` in `U?` generates a message and the type `U?` is the same as `U`.
+- The generic constraint `class?` generates a warning message. The type parameter must be a reference type.
   > *Note*: This message is characterized as “informational” rather than “warning,” so as not to confuse it with the state of the nullable warning setting, which is unrelated. *end note*
 - The null-forgiving operator `!` ([§12.8.9](expressions.md#1289-null-forgiving-expressions)) has no effect.
 
@@ -839,6 +848,7 @@ When the nullable context is ***enabled***:
 - For any reference type `T`, the annotation `?` in `T?` makes `T?` a nullable type, whereas the unannotated `T` is non-nullable.
 - The compiler can use static flow analysis to determine the null state of any reference variable. When nullable warnings are enabled, a reference variable’s null state ([§8.9.5](types.md#895-nullabilities-and-null-states)) is either *not null*, *maybe null*, or *maybe default* and
 - The null-forgiving operator `!` ([§12.8.9](expressions.md#1289-null-forgiving-expressions)) sets the null state of its operand to *not null*.
+- The compiler can issue a warning if the nullability of a type parameter doesn't match the nullability of its corresponding type argument.
 
 ### 8.9.5 Nullabilities and null states
 
@@ -860,6 +870,8 @@ The ***default null state*** of an expression is determined by its type, and the
   - Maybe null when its declaration is in text where the annotations flag is enabled.
   - Not null when its declaration is in text where the annotations flag is disabled.
 - The default null state of a non-nullable reference type is not null.
+
+> *Note:* The *maybe default* state is used with unconstrained type parameters when the type is a non-nullable type, such as `string` and the expression `default(T)` is the null value. Because null is not in the domain for the non-nullable type, the state is maybe default. *end note*
 
 A diagnostic can be produced when a variable ([§9.2.1](variables.md#921-general)) of a non-nullable reference type is initialized or assigned to an expression that is maybe null when that variable is declared in text where the annotation flag is enabled.
 
