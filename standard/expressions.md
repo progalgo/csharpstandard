@@ -185,7 +185,9 @@ The ***overloadable unary operators*** are:
 `+  -  !` (logical negation only) `~  ++  --  true  false`
 
 > *Note*: Although `true` and `false` are not used explicitly in expressions (and therefore are not included in the precedence table in [§12.4.2](expressions.md#1242-operator-precedence-and-associativity)), they are considered operators because they are invoked in several expression contexts: Boolean expressions ([§12.24](expressions.md#1224-boolean-expressions)) and expressions involving the conditional ([§12.18](expressions.md#1218-conditional-operator)) and conditional logical operators ([§12.14](expressions.md#1214-conditional-logical-operators)). *end note*
->
+<!-- markdownlint-disable MD028 -->
+
+<!-- markdownlint-enable MD028 -->
 > *Note*: The null-forgiving operator (postfix `!`, [§12.8.9](expressions.md#1289-null-forgiving-expressions)) is not an overloadable operator. *end note*
 
 The ***overloadable binary operators*** are:
@@ -1824,6 +1826,8 @@ A *null_conditional_projection_initializer* is a restriction of *null_conditiona
 
 ### 12.8.9 Null-forgiving expressions
 
+#### 12.8.9.1 General
+
 A null-forgiving expression’s value, type, classification ([§12.2](expressions.md#122-expression-classifications))
 and safe-context ([§16.4.12](structs.md#16412-safe-context-constraint)) is the value, type, classification and safe-context of its *primary_expression*.
 
@@ -1839,9 +1843,18 @@ null_forgiving_operator
 
 *Note*: The postfix null-forgiving and prefix logical negation operators ([§12.9.4](expressions.md#1294-logical-negation-operator)), while represented by the same lexical token (`!`), are distinct. Only the latter may be overriden ([§15.10](classes.md#1510-operators)), the definition of the null-forgiving operator is fixed. *end note*
 
-<!-- [Placeholder] 12.8.9 A -->
-<!-- [Placeholder] 12.8.9 A End -->
-**The remainder of this subclause, including all of its subclauses, is conditionally normative.**
+It is a compile-time error to apply the null-forgiving operator more than once to the same expression, intervening parentheses notwithstanding.
+
+> *Example*: the following are all invalid:
+>
+> ```csharp
+> var p = q!!;            // error: cannot apply the null_forgiving_operator more than once
+> var s = ( ( m(t) ! ) )! // error: null_forgiving_operator applied twice to m(t)
+> ```
+>
+> *end example*
+
+**The remainder of this subclause and the following sibling subclauses are conditionally normative.**
 
 A compiler which performs static null state analysis ([§8.9.5](types.md#895-nullabilities-and-null-states)) must conform to the following specification.
 
@@ -1850,13 +1863,13 @@ The null-forgiving operator is a compile time pseudo-operation that is used to i
 Applying the null-forgiving operator to an expression for which a compiler’s static null state analysis
 does not produce any warnings is not an error.
 
-#### 12.8.9.1 Overriding a *maybe null* determination
+#### 12.8.9.2 Overriding a “maybe null” determination
 
 Under some circumstances a compiler’s static null state analysis may determine that an expression
-has the null state *maybe null* and issue a warning when other information indicates that the
+has the null state *maybe null* and issue a diagnostic warning when other information indicates that the
 expression cannot be null. Applying the null-forgiving operator to such an expression informs the
-compiler’s static null state analysis that the null state is in *not null*; which both prevents the warning
-message and informs any ongoing analysis.
+compiler’s static null state analysis that the null state is in *not null*; which both prevents the diagnostic
+warning and may inform any ongoing analysis.
 
 > *Example*: Consider the following:
 >
@@ -1880,7 +1893,9 @@ message and informs any ongoing analysis.
 > If `IsValid` returns `true`, `p` can safely be dereferenced to access its `Name` property, and the “dereferencing of a possibly null value” warning can be suppressed using `!`.
 >
 > *end example*
->
+<!-- markdownlint-disable MD028 -->
+
+<!-- markdownlint-enable MD028 -->
 > *Example:* The null-forgiving operator should be used with caution, consider:
 >
 > ```csharp
@@ -1898,7 +1913,7 @@ message and informs any ongoing analysis.
 >
 > *end example*
 
-#### 12.8.9.2 Overriding other null analysis warnings
+#### 12.8.9.3 Overriding other null analysis warnings
 
 In addition to overriding *maybe null* determinations as above there may be other circumstances
 where it is desired to override a compiler’s static null state analysis determination that an
@@ -1944,8 +1959,11 @@ invocation_expression
     ;
 ```
 
-<!-- [Placeholder] 12.8.10.1 -->
-<!-- [Placeholder] 12.8.10.1 End -->
+<!-- [ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
+    in terms of what is included the text will probably be fine but this will need to be confirmed
+-->
+The *primary_expression* may be a *null_forgiving_expression* if and only if it has a *delegate_type*.
+
 An *invocation_expression* is dynamically bound ([§12.3.3](expressions.md#1233-dynamic-binding)) if at least one of the following holds:
 
 - The *primary_expression* has compile-time type `dynamic`.
@@ -2149,8 +2167,12 @@ null_conditional_invocation_expression
     ;
 ```
 
-<!-- [Placeholder] 12.8.11 -->
-<!-- [Placeholder] 12.8.11 End -->
+<!-- [ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
+    in terms of what is included the text will probably be fine but this will need to be confirmed
+-->
+The optional *null_forgiving_operator* may be included if and only if the *null_conditional_member_access* or
+*null_conditional_element_access* has a *delegate_type*.
+
 A  *null_conditional_invocation_expression* expression `E` is of the form `P?A`; where `A` is the remainder of the syntactically equivalent *null_conditional_member_access* or *null_conditional_element_access*, `A` will therefore start with `.` or `[`. Let `PA` signify the concatention of `P` and `A`.
 
 When `E` occurs as a *statement_expression* the meaning of `E` is the same as the meaning of the *statement*:
@@ -6454,8 +6476,6 @@ assignment_operator
     ;
 ```
 
-<!-- [Placeholder] 12.21.1 -->
-<!-- [Placeholder] 12.21.1 End -->
 The left operand of an assignment shall be an expression classified as a variable, or, except for `= ref`, a property access, an indexer access, an event access or a tuple. A declaration expression is not directly permitted as a left operand, but may occur as a step in the evaluation of a deconstructing assignment.
 
 The `=` operator is called the ***simple assignment operator***. It assigns the value or values of the right operand to the variable, property, indexer element or tuple elements given by the left operand. The left operand of the simple assignment operator shall not be an event access (except as described in [§15.8.2](classes.md#1582-field-like-events)). The simple assignment operator is described in [§12.21.2](expressions.md#12212-simple-assignment).

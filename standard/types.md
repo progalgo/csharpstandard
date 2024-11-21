@@ -773,7 +773,8 @@ When the nullable context is ***disabled***:
 > string? s1 = null;    // Informational message; ? is ignored
 > string s2 = null;     // OK; null initialization of a reference
 > s2 = null;            // OK; null assignment to a reference
-> char c1 = s2[1];      // OK; no warning on dereference of a possible null; throws NullReferenceException
+> char c1 = s2[1];      // OK; no warning on dereference of a possible null;
+>                       //     throws NullReferenceException
 > c1 = s2![1];          // OK; ! is ignored
 > ```
 >
@@ -787,7 +788,7 @@ When the nullable context is ***annotations***:
 
 - For any reference type `T`, the annotation `?` in `T?` indicates that `T?` a nullable type, whereas the unannotated `T` is non-nullable.
 - No diagnostic warnings related to nullability are generated.
-- The null-forgiving operator `!` ([§12.8.9](expressions.md#1289-null-forgiving-expressions)) may alter the analyzed null state of its operand and what compile time informative messages are produced.
+- The null-forgiving operator `!` ([§12.8.9](expressions.md#1289-null-forgiving-expressions)) may alter the analyzed null state of its operand and what compile time diagnostic warnings are produced.
 
 > *Example*:
 >
@@ -824,7 +825,8 @@ When the nullable context is ***warnings***, a compiler can generate diagnostics
 > string? s1 = null;    // OK; ? makes s2 nullable
 > string s2 = null;     // OK; null-state of s2 is "maybe null"
 > s2 = null;            // OK; null-state of s2 is "maybe null"
-> char c1 = s2[1];      // Warning; dereference of a possible null; throws NullReferenceException
+> char c1 = s2[1];      // Warning; dereference of a possible null;
+>                       //          throws NullReferenceException
 > c1 = s2![1];          // The warning is suppressed
 > ```
 >
@@ -842,11 +844,11 @@ When the nullable context is ***enabled***:
 
 ### 8.9.5 Nullabilities and null states
 
-A compiler is not required to perform any static analysis nor is it required to generate any diagnostic messages related to nullability.
+A compiler is not required to perform any static analysis nor is it required to generate any diagnostic warnings related to nullability.
 
 **The remainder of this subclause is conditionally normative.**
 
-A compiler that generates diagnostic messages conforms to these rules.
+A compiler that generates diagnostic warnings conforms to these rules.
 
 Every expression has one of three ***null state***s:
 
