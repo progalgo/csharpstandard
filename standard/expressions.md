@@ -1848,7 +1848,7 @@ It is a compile-time error to apply the null-forgiving operator more than once t
 > *Example*: the following are all invalid:
 >
 > ```csharp
-> var p = q!!;            // error: cannot apply the null_forgiving_operator more than once
+> var p = q!!;            // error: applying null_forgiving_operator more than once
 > var s = ( ( m(t) ! ) )! // error: null_forgiving_operator applied twice to m(t)
 > ```
 >
@@ -1959,8 +1959,9 @@ invocation_expression
     ;
 ```
 
-<!-- [ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
-    in terms of what is included the text will probably be fine but this will need to be confirmed
+<!--
+[ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
+in terms of what is included the text will probably be fine but this will need to be confirmed
 -->
 The *primary_expression* may be a *null_forgiving_expression* if and only if it has a *delegate_type*.
 
@@ -2167,8 +2168,9 @@ null_conditional_invocation_expression
     ;
 ```
 
-<!-- [ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
-    in terms of what is included the text will probably be fine but this will need to be confirmed
+<!--
+[ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
+in terms of what is included the text will probably be fine but this will need to be confirmed
 -->
 The optional *null_forgiving_operator* may be included if and only if the *null_conditional_member_access* or
 *null_conditional_element_access* has a *delegate_type*.
@@ -2256,7 +2258,7 @@ Depending on the context in which it is used, an indexer access causes invocatio
 
 ### 12.8.13 Null Conditional Element Access
 
-A *null_conditional_element_access* consists of a *primary_no_array_creation_expression* followed by the two tokens “`?`” and “`[`”, followed by an *argument_list*, followed by a “`]`” token, followed by zero or more *dependent_access*es any of which can be preceeded by a *null_forgiving_operator*.
+A *null_conditional_element_access* consists of a *primary_no_array_creation_expression* followed by the two tokens “`?`” and “`[`”, followed by an *argument_list*, followed by a “`]`” token, followed by zero or more *dependent_access*es any of which can be preceded by a *null_forgiving_operator*.
 
 ```ANTLR
 null_conditional_element_access
@@ -6774,7 +6776,7 @@ Only the following constructs are permitted in constant expressions:
 - The predefined `+`, `-`, `!` (logical negation) and `~` unary operators.
 - The predefined `+`, `-`, `*`, `/`, `%`, `<<`, `>>`, `&`, `|`, `^`, `&&`, `||`, `==`, `!=`, `<`, `>`, `<=`, and `>=` binary operators.
 - The `?:` conditional operator.
-- The `!` null-forgiving operator ([§12.9.4](expressions.md#1289-null-forgiving-expressions)).
+- The `!` null-forgiving operator ([§12.8.9](expressions.md#1289-null-forgiving-expressions)).
 - `sizeof` expressions, provided the unmanaged-type is one of the types specified in [§23.6.9](unsafe-code.md#2369-the-sizeof-operator) for which `sizeof` returns a constant value.
 - Default value expressions, provided the type is one of the types listed above.
 
