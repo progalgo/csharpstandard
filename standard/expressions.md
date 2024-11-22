@@ -59,7 +59,7 @@ The following operations in C# are subject to binding:
 - Delegate invocation: `e(e₁,...,eᵥ)`
 - Element access: `e[e₁,...,eᵥ]`
 - Object creation: new `C(e₁,...,eᵥ)`
-- Overloaded unary operators: `+`, `-`, `!`, `~`, `++`, `--`, `true`, `false`
+- Overloaded unary operators: `+`, `-`, `!` (logical negation only), `~`, `++`, `--`, `true`, `false`
 - Overloaded binary operators: `+`, `-`, `*`, `/`, `%`, `&`, `&&`, `|`, `||`, `??`, `^`, `<<`, `>>`, `==`, `!=`, `>`, `<`, `>=`, `<=`
 - Assignment operators: `=`, `= ref`, `+=`, `-=`, `*=`, `/=`, `%=`, `&=`, `|=`, `^=`, `<<=`, `>>=`
 - Implicit and explicit conversions
@@ -147,8 +147,8 @@ The precedence of an operator is established by the definition of its associated
 >
 > |  **Subclause**      | **Category**                     | **Operators**                                          |
 > |  -----------------  | -------------------------------  | -------------------------------------------------------|
-> |  [§12.8](expressions.md#128-primary-expressions)              | Primary                          | `x.y` `x?.y` `f(x)` `a[x]` `a?[x]` `x++` `x--` `new` `typeof` `default` `checked` `unchecked` `delegate` `stackalloc`  |
-> |  [§12.9](expressions.md#129-unary-operators)              | Unary                            | `+` `-` `!` `~` `++x` `--x` `(T)x` `await x` |
+> |  [§12.8](expressions.md#128-primary-expressions)              | Primary                          | `x.y` `x?.y` `f(x)` `a[x]` `a?[x]` `x++` `x--` `x!` `new` `typeof` `default` `checked` `unchecked` `delegate` `stackalloc`  |
+> |  [§12.9](expressions.md#129-unary-operators)              | Unary                            | `+` `-` `!x` `~` `++x` `--x` `(T)x` `await x` |
 > |  [§12.10](expressions.md#1210-arithmetic-operators)              | Multiplicative                   | `*` `/` `%` |
 > |  [§12.10](expressions.md#1210-arithmetic-operators)              | Additive                         | `+` `-` |
 > |  [§12.11](expressions.md#1211-shift-operators)             | Shift                            | `<<` `>>` |
@@ -182,11 +182,13 @@ All unary and binary operators have predefined implementations. In addition, use
 
 The ***overloadable unary operators*** are:
 
-```csharp
-+  -  !  ~  ++  --  true  false
-```
+`+  -  !` (logical negation only) `~  ++  --  true  false`
 
 > *Note*: Although `true` and `false` are not used explicitly in expressions (and therefore are not included in the precedence table in [§12.4.2](expressions.md#1242-operator-precedence-and-associativity)), they are considered operators because they are invoked in several expression contexts: Boolean expressions ([§12.24](expressions.md#1224-boolean-expressions)) and expressions involving the conditional ([§12.18](expressions.md#1218-conditional-operator)) and conditional logical operators ([§12.14](expressions.md#1214-conditional-logical-operators)). *end note*
+<!-- markdownlint-disable MD028 -->
+
+<!-- markdownlint-enable MD028 -->
+> *Note*: The null-forgiving operator (postfix `!`, [§12.8.9](expressions.md#1289-null-forgiving-expressions)) is not an overloadable operator. *end note*
 
 The ***overloadable binary operators*** are:
 
@@ -295,7 +297,7 @@ When overload resolution rules ([§12.6.4](expressions.md#1264-overload-resoluti
 
 **This subclause is informative.**
 
-Unary numeric promotion occurs for the operands of the predefined `+`, `–`, and `~` unary operators. Unary numeric promotion simply consists of converting operands of type `sbyte`, `byte`, `short`, `ushort`, or `char` to type `int`. Additionally, for the unary – operator, unary numeric promotion converts operands of type `uint` to type `long`.
+Unary numeric promotion occurs for the operands of the predefined `+`, `-`, and `~` unary operators. Unary numeric promotion simply consists of converting operands of type `sbyte`, `byte`, `short`, `ushort`, or `char` to type `int`. Additionally, for the unary – operator, unary numeric promotion converts operands of type `uint` to type `long`.
 
 **End of informative text.**
 
@@ -303,7 +305,7 @@ Unary numeric promotion occurs for the operands of the predefined `+`, `–`, an
 
 **This subclause is informative.**
 
-Binary numeric promotion occurs for the operands of the predefined `+`, `–`, `*`, `/`, `%`, `&`, `|`, `^`, `==`, `!=`, `>`, `<`, `>=`, and `<=` binary operators. Binary numeric promotion implicitly converts both operands to a common type which, in case of the non-relational operators, also becomes the result type of the operation. Binary numeric promotion consists of applying the following rules, in the order they appear here:
+Binary numeric promotion occurs for the operands of the predefined `+`, `-`, `*`, `/`, `%`, `&`, `|`, `^`, `==`, `!=`, `>`, `<`, `>=`, and `<=` binary operators. Binary numeric promotion implicitly converts both operands to a common type which, in case of the non-relational operators, also becomes the result type of the operation. Binary numeric promotion consists of applying the following rules, in the order they appear here:
 
 - If either operand is of type `decimal`, the other operand is converted to type `decimal`, or a binding-time error occurs if the other operand is of type `float` or `double`.
 - Otherwise, if either operand is of type `double`, the other operand is converted to type `double`.
@@ -346,7 +348,7 @@ In both of the above cases, a cast expression can be used to explicitly convert 
 
 ***Lifted operators*** permit predefined and user-defined operators that operate on non-nullable value types to also be used with nullable forms of those types. Lifted operators are constructed from predefined and user-defined operators that meet certain requirements, as described in the following:
 
-- For the unary operators `+`, `++`, `-`, `--`, `!`, and `~`, a lifted form of an operator exists if the operand and result types are both non-nullable value types. The lifted form is constructed by adding a single `?` modifier to the operand and result types. The lifted operator produces a `null` value if the operand is `null`. Otherwise, the lifted operator unwraps the operand, applies the underlying operator, and wraps the result.
+- For the unary operators `+`, `++`, `-`, `--`, `!`(logical negation), and `~`, a lifted form of an operator exists if the operand and result types are both non-nullable value types. The lifted form is constructed by adding a single `?` modifier to the operand and result types. The lifted operator produces a `null` value if the operand is `null`. Otherwise, the lifted operator unwraps the operand, applies the underlying operator, and wraps the result.
 - For the binary operators `+`, `-`, `*`, `/`, `%`, `&`, `|`, `^`, `<<`, and `>>`, a lifted form of an operator exists if the operand and result types are all non-nullable value types. The lifted form is constructed by adding a single `?` modifier to each operand and result type. The lifted operator produces a `null` value if one or both operands are `null` (an exception being the `&` and `|` operators of the `bool?` type, as described in [§12.13.5](expressions.md#12135-nullable-boolean--and--operators)). Otherwise, the lifted operator unwraps the operands, applies the underlying operator, and wraps the result.
 - For the equality operators `==` and `!=`, a lifted form of an operator exists if the operand types are both non-nullable value types and if the result type is `bool`. The lifted form is constructed by adding a single `?` modifier to each operand type. The lifted operator considers two `null` values equal, and a `null` value unequal to any non-`null` value. If both operands are non-`null`, the lifted operator unwraps the operands and applies the underlying operator to produce the `bool` result.
 - For the relational operators `<`, `>`, `<=`, and `>=`, a lifted form of an operator exists if the operand types are both non-nullable value types and if the result type is `bool`. The lifted form is constructed by adding a single `?` modifier to each operand type. The lifted operator produces the value `false` if one or both operands are `null`. Otherwise, the lifted operator unwraps the operands and applies the underlying operator to produce the `bool` result.
@@ -1273,7 +1275,6 @@ Primary expressions include the simplest forms of expressions.
 primary_expression
     : primary_no_array_creation_expression
     | array_creation_expression
-    | null_forgiving_expression
     ;
 
 primary_no_array_creation_expression
@@ -1291,6 +1292,7 @@ primary_no_array_creation_expression
     | base_access
     | post_increment_expression
     | post_decrement_expression
+    | null_forgiving_expression
     | object_creation_expression
     | delegate_creation_expression
     | anonymous_object_creation_expression
@@ -1307,7 +1309,7 @@ primary_no_array_creation_expression
     ;
 ```
 
-> *Note*: These grammar rules are not ANTLR-ready as they are part of a set of mutually left-recursive rules (`primary_expression`, `primary_no_array_creation_expression`, `member_access`, `invocation_expression`, `element_access`, `post_increment_expression`, `post_decrement_expression`, `pointer_member_access` and `pointer_element_access`) which ANTLR does not handle. Standard techniques can be used to transform the grammar to remove the mutual left-recursion. This has not been done as not all parsing strategies require it (e.g. an LALR parser would not) and doing so would obfuscate the structure and description. *end note*
+> *Note*: These grammar rules are not ANTLR-ready as they are part of a set of mutually left-recursive rules (`primary_expression`, `primary_no_array_creation_expression`, `member_access`, `invocation_expression`, `element_access`, `post_increment_expression`, `post_decrement_expression`, `null_forgiving_expression`, `pointer_member_access` and `pointer_element_access`) which ANTLR does not handle. Standard techniques can be used to transform the grammar to remove the mutual left-recursion. This has not been done as not all parsing strategies require it (e.g. an LALR parser would not) and doing so would obfuscate the structure and description. *end note*
 
 *pointer_member_access* ([§23.6.3](unsafe-code.md#2363-pointer-member-access)) and *pointer_element_access* ([§23.6.4](unsafe-code.md#2364-pointer-element-access)) are only available in unsafe code ([§23](unsafe-code.md#23-unsafe-code)).
 
@@ -1749,12 +1751,12 @@ In a member access of the form `E.I`, if `E` is a single identifier, and if the 
 
 A *null_conditional_member_access* is a conditional version of *member_access* ([§12.8.7](expressions.md#1287-member-access)) and it is a binding time error if the result type is `void`. For a null conditional expression where the result type may be `void` see ([§12.8.11](expressions.md#12811-null-conditional-invocation-expression)).
 
-A *null_conditional_member_access* consists of a *primary_expression* followed by the two tokens “`?`” and “`.`”, followed by an *identifier* with an optional *type_argument_list*, followed by zero or more *dependent_access*es.
+A *null_conditional_member_access* consists of a *primary_expression* followed by the two tokens “`?`” and “`.`”, followed by an *identifier* with an optional *type_argument_list*, followed by zero or more *dependent_access*es any of which can be preceeded by a *null_forgiving_operator*.
 
 ```ANTLR
 null_conditional_member_access
     : primary_expression '?' '.' identifier type_argument_list?
-      dependent_access*
+      (null_forgiving_operator? dependent_access)*
     ;
     
 dependent_access
@@ -1824,21 +1826,50 @@ A *null_conditional_projection_initializer* is a restriction of *null_conditiona
 
 ### 12.8.9 Null-forgiving expressions
 
-This operator sets the null state ([§8.9.5](types.md#895-nullabilities-and-null-states)) of the operand to “not null”.
+#### 12.8.9.1 General
+
+A null-forgiving expression’s value, type, classification ([§12.2](expressions.md#122-expression-classifications))
+and safe-context ([§16.4.12](structs.md#16412-safe-context-constraint)) is the value, type, classification and safe-context of its *primary_expression*.
 
 ```ANTLR
 null_forgiving_expression
-    : primary_no_array_creation_expression suppression
+    : primary_expression null_forgiving_operator
     ;
 
-suppression
+null_forgiving_operator
     : '!'
     ;
 ```
 
-This operator has no runtime effect; it evaluates to the result of its operand, and that result retains that operand’s classification.
+*Note*: The postfix null-forgiving and prefix logical negation operators ([§12.9.4](expressions.md#1294-logical-negation-operator)), while represented by the same lexical token (`!`), are distinct. Only the latter may be overriden ([§15.10](classes.md#1510-operators)), the definition of the null-forgiving operator is fixed. *end note*
 
-The null-forgiving operator is used to declare that an expression not known to be a value type is not null.
+It is a compile-time error to apply the null-forgiving operator more than once to the same expression, intervening parentheses notwithstanding.
+
+> *Example*: the following are all invalid:
+>
+> ```csharp
+> var p = q!!;            // error: applying null_forgiving_operator more than once
+> var s = ( ( m(t) ! ) )! // error: null_forgiving_operator applied twice to m(t)
+> ```
+>
+> *end example*
+
+**The remainder of this subclause and the following sibling subclauses are conditionally normative.**
+
+A compiler which performs static null state analysis ([§8.9.5](types.md#895-nullabilities-and-null-states)) must conform to the following specification.
+
+The null-forgiving operator is a compile time pseudo-operation that is used to inform a compiler’s static null state analysis. It has two uses: to override a compiler’s determination that an expression *maybe null*; and to override a compiler issuing a warning related to nullability.
+
+Applying the null-forgiving operator to an expression for which a compiler’s static null state analysis
+does not produce any warnings is not an error.
+
+#### 12.8.9.2 Overriding a “maybe null” determination
+
+Under some circumstances a compiler’s static null state analysis may determine that an expression
+has the null state *maybe null* and issue a diagnostic warning when other information indicates that the
+expression cannot be null. Applying the null-forgiving operator to such an expression informs the
+compiler’s static null state analysis that the null state is in *not null*; which both prevents the diagnostic
+warning and may inform any ongoing analysis.
 
 > *Example*: Consider the following:
 >
@@ -1859,9 +1890,62 @@ The null-forgiving operator is used to declare that an expression not known to b
 >     person != null && person.Name != null;
 > ```
 >
-> If `IsValid` returns `true`, `p` can safely be dereferenced to access its `Name` property, and the “dereferencing of a possibly null value” warning can be suppressed using `!`. *end example*
+> If `IsValid` returns `true`, `p` can safely be dereferenced to access its `Name` property, and the “dereferencing of a possibly null value” warning can be suppressed using `!`.
+>
+> *end example*
+<!-- markdownlint-disable MD028 -->
 
-The null state ([§8.9.5](types.md#895-nullabilities-and-null-states)) of a *null_forgiving_expression* is “not null.”
+<!-- markdownlint-enable MD028 -->
+> *Example:* The null-forgiving operator should be used with caution, consider:
+>
+> ```csharp
+> #nullable enable
+> int B(int? x)
+> {
+>     int y = (int)x!; // quash warning, throw at runtime if x is null
+>     return y;
+> }
+> ```
+>
+> Here the null-forgiving operator is applied to a value type and quashes any warning on
+> `x`. However if `x` is `null` at runtime an exception will be thrown as `null` cannot
+> be cast to `int`.
+>
+> *end example*
+
+#### 12.8.9.3 Overriding other null analysis warnings
+
+In addition to overriding *maybe null* determinations as above there may be other circumstances
+where it is desired to override a compiler’s static null state analysis determination that an
+expression requires one or more warnings. Applying the
+null-forgiving operator to such an expression requests that the compiler
+does not issue any warnings for the expression. In response a compiler may choose not
+to issue warnings and may also modify its further analysis.
+
+> *Example*: Consider the following:
+>
+> ```csharp
+> #nullable enable
+> public static void Assign(out string? lv, string? rv) { lv = rv; }
+>
+> public string M(string? t)
+> {
+>     string s;
+>     Assign(out s!, t ?? "«argument was null»");
+>     return s;
+> }
+> ```
+>
+> The types of method `Assign`’s parameters, `lv` & `rv`, are `string?`, with `lv` being
+> an output parameter, and it performs a simple assignment.
+>
+> Method `M` passes the variable `s`, of type `string`, as `Assign`’s output parameter, the
+> compiler used issues a warning as `s` is not a nullable variable. Given that `Assign`’s
+> second argument cannot be null the null-forgiving operator is used to quash the warning.
+>
+> *end example*
+
+**End of conditionally normative text.**
 
 ### 12.8.10 Invocation expressions
 
@@ -1874,6 +1958,12 @@ invocation_expression
     : primary_expression '(' argument_list? ')'
     ;
 ```
+
+<!--
+[ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
+in terms of what is included the text will probably be fine but this will need to be confirmed
+-->
+The *primary_expression* may be a *null_forgiving_expression* if and only if it has a *delegate_type*.
 
 An *invocation_expression* is dynamically bound ([§12.3.3](expressions.md#1233-dynamic-binding)) if at least one of the following holds:
 
@@ -2073,10 +2163,17 @@ Unlike the syntactically equivalent *null_conditional_member_access* or *null_co
 
 ```ANTLR
 null_conditional_invocation_expression
-    : null_conditional_member_access '(' argument_list? ')'
-    | null_conditional_element_access '(' argument_list? ')'
+    : null_conditional_member_access null_forgiving_operator? '(' argument_list? ')'
+    | null_conditional_element_access null_forgiving_operator? '(' argument_list? ')'
     ;
 ```
+
+<!--
+[ToDo] C#9’s function pointers are also excluded, as the following restriction is stated
+in terms of what is included the text will probably be fine but this will need to be confirmed
+-->
+The optional *null_forgiving_operator* may be included if and only if the *null_conditional_member_access* or
+*null_conditional_element_access* has a *delegate_type*.
 
 A  *null_conditional_invocation_expression* expression `E` is of the form `P?A`; where `A` is the remainder of the syntactically equivalent *null_conditional_member_access* or *null_conditional_element_access*, `A` will therefore start with `.` or `[`. Let `PA` signify the concatention of `P` and `A`.
 
@@ -2161,12 +2258,12 @@ Depending on the context in which it is used, an indexer access causes invocatio
 
 ### 12.8.13 Null Conditional Element Access
 
-A *null_conditional_element_access* consists of a *primary_no_array_creation_expression* followed by the two tokens “`?`” and “`[`”, followed by an *argument_list*, followed by a “`]`” token, followed by zero or more *dependent_access*es.
+A *null_conditional_element_access* consists of a *primary_no_array_creation_expression* followed by the two tokens “`?`” and “`[`”, followed by an *argument_list*, followed by a “`]`” token, followed by zero or more *dependent_access*es any of which can be preceded by a *null_forgiving_operator*.
 
 ```ANTLR
 null_conditional_element_access
     : primary_no_array_creation_expression '?' '[' argument_list ']'
-      dependent_access*
+      (null_forgiving_operator? dependent_access)*
     ;
 ```
 
@@ -3362,14 +3459,16 @@ An *anonymous_method_expression* is one of two ways of defining an anonymous fun
 
 ### 12.9.1 General
 
-The `+`, `-`, `!`, `~`, `++`, `--`, cast, and `await` operators are called the unary operators.
+The `+`, `-`, `!` (logical negation [§12.9.4](expressions.md#1294-logical-negation-operator) only), `~`, `++`, `--`, cast, and `await` operators are called the unary operators.
+
+> *Note*: The postfix null-forgiving operator ([§12.8.9](expressions.md#1289-null-forgiving-expressions)), `!`, due to its compile-time and non-overloadable only nature, is excluded from the above list. *end note*
 
 ```ANTLR
 unary_expression
     : primary_expression
     | '+' unary_expression
     | '-' unary_expression
-    | '!' unary_expression
+    | logical_negation_operator unary_expression
     | '~' unary_expression
     | pre_increment_expression
     | pre_decrement_expression
@@ -3447,6 +3546,8 @@ bool operator !(bool x);
 This operator computes the logical negation of the operand: If the operand is `true`, the result is `false`. If the operand is `false`, the result is `true`.
 
 Lifted ([§12.4.8](expressions.md#1248-lifted-operators)) forms of the unlifted predefined logical negation operator defined above are also predefined.
+
+*Note*: The prefix logical negation and postfix null-forgiving operators ([§12.8.9](expressions.md#1289-null-forgiving-expressions)), while represented by the same lexical token (`!`), are distinct. *end note*
 
 ### 12.9.5 Bitwise complement operator
 
@@ -3607,7 +3708,7 @@ An awaiter’s implementation of the interface methods `INotifyCompletion.OnComp
 
 ### 12.10.1 General
 
-The `*`, `/`, `%`, `+`, and `–` operators are called the arithmetic operators.
+The `*`, `/`, `%`, `+`, and `-` operators are called the arithmetic operators.
 
 ```ANTLR
 multiplicative_expression
@@ -4414,9 +4515,9 @@ The tuple equality operator `x == y` is evaluated as follows:
 - For each pair of elements `xi` and `yi` in lexical order:
   - The operator `xi == yi` is evaluated, and a result of type `bool` is obtained in the following way:
     - If the comparison yielded a `bool` then that is the result.
-    - Otherwise if the comparison yielded a `dynamic` then the operator `false` is dynamically invoked on it, and the resulting `bool` value is negated with the `!` operator.
+    - Otherwise if the comparison yielded a `dynamic` then the operator `false` is dynamically invoked on it, and the resulting `bool` value is negated with the logical negation operator (`!`).
     - Otherwise, if the type of the comparison has an implicit conversion to `bool`, that conversion is applied.
-    - Otherwise, if the type of the comparison has an operator `false`, that operator is invoked and the resulting `bool` value is negated with the `!` operator.
+    - Otherwise, if the type of the comparison has an operator `false`, that operator is invoked and the resulting `bool` value is negated with the logical negation operator (`!`).
   - If the resulting `bool` is `false`, then no further evaluation occurs, and the result of the tuple equality operator is `false`.
 - If all element comparisons yielded `true`, the result of the tuple equality operator is `true`.
 
@@ -6674,9 +6775,10 @@ Only the following constructs are permitted in constant expressions:
 - Cast expressions.
 - `checked` and `unchecked` expressions.
 - `nameof` expressions.
-- The predefined `+`, `–`, `!`, and `~` unary operators.
-- The predefined `+`, `–`, `*`, `/`, `%`, `<<`, `>>`, `&`, `|`, `^`, `&&`, `||`, `==`, `!=`, `<`, `>`, `<=`, and `>=` binary operators.
+- The predefined `+`, `-`, `!` (logical negation) and `~` unary operators.
+- The predefined `+`, `-`, `*`, `/`, `%`, `<<`, `>>`, `&`, `|`, `^`, `&&`, `||`, `==`, `!=`, `<`, `>`, `<=`, and `>=` binary operators.
 - The `?:` conditional operator.
+- The `!` null-forgiving operator ([§12.8.9](expressions.md#1289-null-forgiving-expressions)).
 - `sizeof` expressions, provided the unmanaged-type is one of the types specified in [§23.6.9](unsafe-code.md#2369-the-sizeof-operator) for which `sizeof` returns a constant value.
 - Default value expressions, provided the type is one of the types listed above.
 
