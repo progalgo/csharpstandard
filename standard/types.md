@@ -715,12 +715,13 @@ unmanaged_type
     ;
 ```
 
-An *unmanaged_type* is any type that isn’t a *reference_type*, a *type_parameter*, or a constructed type, and contains no instance fields whose type is not an *unmanaged_type*. In other words, an *unmanaged_type* is one of the following:
+An *unmanaged_type* is any type that is neither a *reference_type* nor a *type_parameter* that is not constrained to be unmanaged, and contains no instance fields whose type is not an *unmanaged_type*. In other words, an *unmanaged_type* is one of the following:
 
 - `sbyte`, `byte`, `short`, `ushort`, `int`, `uint`, `long`, `ulong`, `char`, `float`, `double`, `decimal`, or `bool`.
 - Any *enum_type*.
-- Any user-defined *struct_type* that is not a constructed type and contains instance fields of *unmanaged_type*s only.
-- In unsafe code ([§23.2](unsafe-code.md#232-unsafe-contexts)), any *pointer_type* ([§23.3](unsafe-code.md#233-pointer-types)).
+- Any user-defined *struct_type* that contains instance fields of *unmanaged_type*s only.
+- Any type parameter which is constrained to be unmanaged.
+- Any *pointer_type* ([§23.3](unsafe-code.md#233-pointer-types)).
 
 ## 8.9 Reference Types and nullability
 
