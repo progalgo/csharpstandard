@@ -1305,7 +1305,6 @@ primary_no_array_creation_expression
     | anonymous_method_expression
     | pointer_member_access     // unsafe code support
     | pointer_element_access    // unsafe code support
-    | stackalloc_expression
     ;
 ```
 
@@ -2722,6 +2721,7 @@ array_creation_expression
       array_initializer?
     | 'new' array_type array_initializer
     | 'new' rank_specifier array_initializer
+    | stackalloc_expression
     ;
 ```
 
